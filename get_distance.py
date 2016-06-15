@@ -16,14 +16,27 @@ with open('data.csv', 'rb') as rcsvfile:
                             quotechar='|',
                             quoting=csv.QUOTE_MINIMAL)
         for row in reader:
-            orig_coord = row[0]
-            dest_coord = row[1]
+            orig01_coord = row[0]
+            dest01_coord = row[1]
             url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={0}\
                   &destinations={1}&key={2}&mode=driving&language=en-EN\
-                  &units=metric".format(str(orig_coord),
-                                        str(dest_coord),
+                  &units=metric".format(str(orig01_coord),
+                                        str(dest01_coord),
                                         str(API_Key))
             result = simplejson.load(urllib.urlopen(url))
-            driving_distance = result['rows'][0][
+            driving_distance01 = result['rows'][0][
                 'elements'][0]['distance']['value']
-            writer.writerow([orig_coord, dest_coord, driving_distance])
+
+            orig02_coord = row[1]
+            dest02_coord = row[0]
+            url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins={0}\
+                  &destinations={1}&key={2}&mode=driving&language=en-EN\
+                  &units=metric".format(str(orig02_coord),
+                                        str(dest02_coord),
+                                        str(API_Key))
+            result = simplejson.load(urllib.urlopen(url))
+            driving_distance02 = result['rows'][0][
+                'elements'][0]['distance']['value']
+            driving_distance = (driving_distance01 + driving_distance02) / 2
+            print orig01_coord, dest01_coord, driving_distance
+            writer.writerow([orig01_coord, dest01_coord, driving_distance])
